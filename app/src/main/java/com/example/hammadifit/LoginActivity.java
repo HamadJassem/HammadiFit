@@ -1,6 +1,7 @@
 package com.example.hammadifit;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -68,7 +69,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             }
                             else
                             {
-                                Toast.makeText(getApplicationContext(), "failed to login", Toast.LENGTH_SHORT).show();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+
+                                builder.setTitle("Failed To Sign In");
+                                builder.setMessage("Invalid Email or Password");
+                                builder.setPositiveButton("OK", null);
+                                builder.show();
                             }
                         }
                     });

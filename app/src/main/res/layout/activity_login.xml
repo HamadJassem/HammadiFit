@@ -8,7 +8,7 @@
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Ùsername" />
+        android:text="Email" />
 
     <EditText
         android:id="@+id/editTextUsername"
@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Name" />
+        android:hint="hamad@hamad.com" />
 
     <TextView
         android:id="@+id/textView2"
@@ -29,14 +29,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name" />
+        android:inputType="textPassword" />
 
     <Button
         android:id="@+id/buttonLogIn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="Log In" />
 
     <TextView
         android:id="@+id/textViewRegister"
