@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "547101394009",
+    "firebase_url": "https://fir-test-1ddf9-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "fir-test-1ddf9",
+    "storage_bucket": "fir-test-1ddf9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547101394009:android:a5c1391bb1e310c4621d48",
+        "android_client_info": {
+          "package_name": "com.example.firebaseauth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "547101394009-bauu586lvegigbut5i8bbvvpgfhfafma.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADFBbCEImLcVD0rq26vG83SKvWVVv29Fw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "547101394009-bauu586lvegigbut5i8bbvvpgfhfafma.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547101394009:android:177314a1e9805503621d48",
+        "android_client_info": {
+          "package_name": "com.example.firebasetest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "547101394009-bauu586lvegigbut5i8bbvvpgfhfafma.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADFBbCEImLcVD0rq26vG83SKvWVVv29Fw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "547101394009-bauu586lvegigbut5i8bbvvpgfhfafma.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547101394009:android:6eb800145620804d621d48",
+        "android_client_info": {
+          "package_name": "com.example.hammadifit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "547101394009-bauu586lvegigbut5i8bbvvpgfhfafma.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADFBbCEImLcVD0rq26vG83SKvWVVv29Fw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "547101394009-bauu586lvegigbut5i8bbvvpgfhfafma.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
