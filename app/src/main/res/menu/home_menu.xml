@@ -3,6 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/ItemProfile"
+        android:icon="@drawable/profile_icon"
+        android:title="Profile"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/ItemLogout"
         android:icon="@android:drawable/ic_lock_power_off"
         android:title="ItemLogout"

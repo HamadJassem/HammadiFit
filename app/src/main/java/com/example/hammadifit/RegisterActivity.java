@@ -95,7 +95,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             else
             {
                 try
-                {
+                { //TODO add validation for Existing user and email
                     float heightF = Float.parseFloat(height);
                     float weightF = Float.parseFloat(weight);
                     if(mDatabase.child("users").child(username) == null) {
