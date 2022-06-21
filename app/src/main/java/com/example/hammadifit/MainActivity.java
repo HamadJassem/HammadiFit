@@ -84,7 +84,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                     else {
                        // loggedUser = task.getResult().getValue(User.class);
-                      loggedUser = task.getResult().child(userId).getValue(User.class);
+                        loggedUser = task.getResult().child(userId).getValue(User.class);
+                        if(loggedUser == null) //weird bug when backing off from a page to home.
+                            loggedUser = task.getResult().getValue(User.class);
+
                       updateUI();
                     }
                 }
@@ -125,6 +128,16 @@ public class MainActivity extends AppCompatActivity {
 
                 }
                 return true;
+            case R.id.ItemProfile:
+                if(loggedUser != null)
+                {
+                    Intent profile = new Intent(this, ProfileActivity.class);
+                    profile.putExtra("username", loggedUser.username);
+                    profile.putExtra("gender", loggedUser.gender);
+                    profile.putExtra("height", loggedUser.height);
+                    profile.putExtra("weight", loggedUser.weight);
+                    startActivity(profile);
+                }
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -132,6 +145,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void updateUI() {
-        msg_tv.setText("Hello, " + loggedUser.username);
+        try { //try catch needed in case loggedUser is null.
+            msg_tv.setText("Hello, " + loggedUser.username);
+        }
+        catch (Exception e)
+        {
+            // do nothing;
+        }
+
     }
 }
