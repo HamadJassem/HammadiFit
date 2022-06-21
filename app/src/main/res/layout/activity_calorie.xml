@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CalorieActivity">
+
+    <ProgressBar
+        android:id="@+id/progressBarConsumedCalories"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="164dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="27dp"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewCaloriesConsumed"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textViewTotalCalories" />
+
+    <TextView
+        android:id="@+id/textViewTotalCalories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="77dp"
+        android:text="TextView"
+        android:textSize="19sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewCaloriesConsumed"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="45dp"
+        android:layout_marginBottom="46dp"
+        android:text="TextView"
+        android:textSize="19sp"
+        app:layout_constraintBottom_toTopOf="@+id/editTextDishName"
+        app:layout_constraintEnd_toEndOf="@+id/progressBarConsumedCalories"
+        app:layout_constraintStart_toStartOf="@+id/progressBarConsumedCalories"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTotalCalories" />
+
+    <EditText
+        android:id="@+id/editTextFatGram3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="16dp"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        app:layout_constraintBottom_toTopOf="@+id/textView11"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView10"
+        app:layout_constraintTop_toTopOf="@+id/editTextFatGram2" />
+
+    <EditText
+        android:id="@+id/editTextFatGram2"
+        android:layout_width="113dp"
+        android:layout_height="23dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="19dp"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        app:layout_constraintBottom_toBottomOf="@+id/textView10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+    <EditText
+        android:id="@+id/editTextFatGram"
+        android:layout_width="0dp"
+        android:layout_height="37dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="22dp"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextFatGram2"
+        app:layout_constraintEnd_toStartOf="@+id/textView10"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextFatGram2" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="60dp"
+        android:text="Carbs in Grams"
+        app:layout_constraintStart_toStartOf="@+id/editTextFatGram3"
+        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="Fat in Grams"
+        app:layout_constraintEnd_toEndOf="@+id/editTextFatGram"
+        app:layout_constraintTop_toBottomOf="@+id/editTextFatGram" />
+
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp"
+        android:text="Proteins in Grams"
+        app:layout_constraintBottom_toBottomOf="@+id/textView11"
+        app:layout_constraintEnd_toStartOf="@+id/editTextFatGram3"
+        app:layout_constraintStart_toEndOf="@+id/editTextFatGram" />
+
+    <EditText
+        android:id="@+id/editTextDishName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="220dp"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="44dp"
+        android:text="Food Name"
+        app:layout_constraintStart_toStartOf="@+id/editTextFatGram2"
+        app:layout_constraintTop_toTopOf="@+id/editTextDishName" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="117dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="100dp"
+        android:text="Add Dish"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.506"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextFatGram2" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

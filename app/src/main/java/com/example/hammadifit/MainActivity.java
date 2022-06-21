@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
@@ -35,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
     private User loggedUser = null;
     FirebaseUser currentUser = null;
     TextView msg_tv;
+
+    ImageButton buttonWorkout, buttonCalorie, buttonSteps;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +50,13 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+        buttonCalorie = findViewById(R.id.imageButtonCalorie);
+        buttonWorkout = findViewById(R.id.imageButtonWorkout);
+        buttonSteps = findViewById(R.id.imageButtonSteps);
+
+        buttonCalorie.setOnClickListener(this);
+        buttonWorkout.setOnClickListener(this);
+        buttonSteps.setOnClickListener(this);
 
 
 
@@ -153,5 +164,34 @@ public class MainActivity extends AppCompatActivity {
             // do nothing;
         }
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId())
+        {
+            case R.id.imageButtonWorkout:
+                break;
+            case R.id.imageButtonSteps:
+                break;
+            case R.id.imageButtonCalorie:
+                if(loggedUser != null)
+                {
+                    Intent CalorieAct = new Intent(this, CalorieActivity.class);
+                    CalorieAct.putExtra("username", loggedUser.username);
+                    CalorieAct.putExtra("gender", loggedUser.gender);
+                    CalorieAct.putExtra("height", loggedUser.height);
+                    CalorieAct.putExtra("weight", loggedUser.weight);
+                    CalorieAct.putExtra("age", loggedUser.age);
+                    startActivity(CalorieAct);
+                }
+                else
+                {
+                    Toast.makeText(this, "wait", Toast.LENGTH_SHORT).show();
+                }
+
+
+                break;
+        }
     }
 }

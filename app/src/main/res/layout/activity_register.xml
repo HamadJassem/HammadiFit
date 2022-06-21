@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="password"
+        android:hint="******"
         android:inputType="textPassword" />
 
     <TextView
@@ -71,6 +71,20 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="numberDecimal" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Age" />
+
+    <EditText
+        android:id="@+id/editTextAgeRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="20"
+        android:inputType="number" />
 
     <RadioGroup
         android:layout_width="wrap_content"
