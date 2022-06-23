@@ -19,6 +19,7 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class CalorieActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -67,7 +68,7 @@ public class CalorieActivity extends AppCompatActivity implements View.OnClickLi
                 float carbsV = Float.parseFloat(carbs_et.getText().toString());
                 String foodName = food_name_et.getText().toString();
                 double calories = 9*fatV + 4*proteinV + 4*carbsV;
-                db.insertItem(foodName, calories, getIntent().getStringExtra("UID"), System.currentTimeMillis());
+                db.insertItem(foodName, calories, getIntent().getStringExtra("UID"), Calendar.getInstance().getTimeInMillis());
                 updateUI();
             }
             catch (Exception e)
@@ -99,6 +100,11 @@ public class CalorieActivity extends AppCompatActivity implements View.OnClickLi
                 builder.setMessage(message);
                 builder.setPositiveButton("Got It!", null);
                 builder.show();
+                return true;
+            case R.id.CalorieItemStats:
+                Intent stats = new Intent(this, CalorieStats.class);
+                stats.putExtra("UID", UID);
+                startActivity(stats);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

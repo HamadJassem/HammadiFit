@@ -12,4 +12,9 @@
         android:icon="@android:drawable/ic_dialog_info"
         android:title="Info"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/CalorieItemStats"
+        android:icon="@drawable/stats_icon"
+        android:title="CalorieItemStats"
+        app:showAsAction="always" />
 </menu>

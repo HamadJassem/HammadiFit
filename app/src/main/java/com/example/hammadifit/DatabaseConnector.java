@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.location.Location;
 import android.os.Build;
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.RequiresApi;
 
@@ -110,6 +111,36 @@ public class DatabaseConnector {
         return database.rawQuery("SELECT _id, name, calorie, time, UID FROM calories WHERE UID="+"'"+UID+"'"+" AND time > " + timeFrom12AM + " ORDER BY time DESC;", null);
     }
 
+
+    public Cursor getAggregatedItemsWeekly(String UID)
+    {
+        return database.rawQuery(
+                "SELECT Date(datetime(time/1000, 'unixepoch')) AS timeAGG, sum(calorie) AS calorieSUM \n" +
+                "FROM calories\n" +
+                "WHERE UID= '"+UID+"' \n" +
+                "GROUP BY timeAGG\n" +
+                "ORDER BY timeAGG DESC\n" +
+                "LIMIT 7\n" +
+                "\n ", null);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public Cursor getAggregatedItemsToday(String UID) {
+        LocalDate currentdate = LocalDate.now();
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.MONTH, currentdate.getMonthValue()-1);
+        c.set(Calendar.YEAR, currentdate.getYear());
+        c.set(Calendar.DAY_OF_MONTH, currentdate.getDayOfMonth());
+        c.set(Calendar.HOUR, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+
+        Log.d("date", c.getTime().toString());
+
+        long timeFrom12AM = c.getTimeInMillis();
+        return database.rawQuery("SELECT name, sum(calorie) AS calorieSum FROM (SELECT _id, name, calorie, time, UID FROM calories WHERE UID="+"'"+UID+"'"+" AND time > " + timeFrom12AM + ") GROUP BY name", null);
+    }
+
     public ArrayList<Calorie> getCalories(String UID)
     {
         ArrayList<Calorie> list = new ArrayList<Calorie>();
@@ -132,6 +163,7 @@ public class DatabaseConnector {
         close(); //close the database
         return list;
     }
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public ArrayList<Calorie> getCaloriesToday(String UID)
     {
         ArrayList<Calorie> list = new ArrayList<Calorie>();
@@ -154,6 +186,42 @@ public class DatabaseConnector {
         close(); //close the database
         return list;
     }
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public ArrayList<Pair<String, Double>> getAggregatedCaloriesToday(String UID)
+    {
+        ArrayList<Pair<String, Double>> list = new ArrayList<>();
+        this.openReadableDB();
+        Cursor cursor = getAggregatedItemsToday(UID);
+        while (cursor.moveToNext())
+        {
+            String name = cursor.getString(0);
+            double calorie = cursor.getDouble(1);
+            list.add(new Pair<>(name, calorie));
+        }
+        if (cursor != null){
+            cursor.close();
+        }
+        close(); //close the database
+        return list;
+    }
+    public ArrayList<Pair<String, Double>> getAggregatedCaloriesWeekly(String UID)
+    {
+        ArrayList<Pair<String, Double>> list = new ArrayList<>();
+        this.openReadableDB();
+        Cursor cursor = getAggregatedItemsWeekly(UID);
+        while (cursor.moveToNext())
+        {
+            String name = cursor.getString(0);
+            double calorie = cursor.getDouble(1);
+            list.add(new Pair<>(name, calorie));
+        }
+        if (cursor != null){
+            cursor.close();
+        }
+        close(); //close the database
+        return list;
+    }
+
 
 
 
