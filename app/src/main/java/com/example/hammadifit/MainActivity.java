@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     CalorieAct.putExtra("height", loggedUser.height);
                     CalorieAct.putExtra("weight", loggedUser.weight);
                     CalorieAct.putExtra("age", loggedUser.age);
+                    CalorieAct.putExtra("UID", mAuth.getUid());
                     startActivity(CalorieAct);
                 }
                 else

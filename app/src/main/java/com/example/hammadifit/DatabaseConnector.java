@@ -7,14 +7,23 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.location.Location;
+import android.os.Build;
+import android.util.Log;
 
+import androidx.annotation.RequiresApi;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class DatabaseConnector {
     // database name
     private static final String DATABASE_NAME = "FitnessApp";
     private SQLiteDatabase database; // TS: to run SQL commands
     private DatabaseOpenHelper databaseOpenHelper; // TS: create or open the database
+    private final long DAY = 86400000;
 
     // public constructor for DatabaseConnector
     public DatabaseConnector(Context context) {
@@ -23,30 +32,38 @@ public class DatabaseConnector {
                 new DatabaseOpenHelper(context, DATABASE_NAME, null, 1);
     } // end DatabaseConnector constructor
 
+    private void openReadableDB() {
+        database = databaseOpenHelper.getReadableDatabase();
+    }
+
+    private void openWriteableDB() {
+        database = databaseOpenHelper.getWritableDatabase();
+    }
     // open the database connection
-    public void open() throws SQLException {
+    public void open() throws SQLException
+    {
         // create or open a database for reading/writing
-        database = databaseOpenHelper.getWritableDatabase();//TS: at the first call, onCreate is called
+        database = databaseOpenHelper.getWritableDatabase();
+        //TS: at the first call, onCreate is called
     }
 
     // close the database connection
-    public void close() {
+    public void close()
+    {
         if (database != null)
             database.close(); // close the database connection
     }
 
     // inserts a new contact in the database
-    public void insertContact(String name, String email, String phone,
-                              String state, String city) {
-        ContentValues newContact = new ContentValues();
-        newContact.put("name", name);
-        newContact.put("email", email);
-        newContact.put("phone", phone);
-        newContact.put("street", state);
-        newContact.put("city", city);
+    public void insertItem(String name, double calorie, String uid, long time) {
+        ContentValues newItem = new ContentValues();
+        newItem.put("name", name);
+        newItem.put("calorie", calorie);
+        newItem.put("time", time);
+        newItem.put("uid", uid);
 
         open(); // open the database
-        database.insert("contacts", null, newContact);
+        database.insert("calories", null, newItem);
         close(); // close the database
     }
 
@@ -66,8 +83,76 @@ public class DatabaseConnector {
     }
 
     // return a Cursor with all contact information in the database
+    public Cursor getAllItems() {
+        return database.rawQuery("SELECT _id, name, calorie, time FROM calories ORDER BY time DESC;", null);
+    }
     public Cursor getAllItems(String UID) {
-        return database.rawQuery("SELECT _id, name, calorie, time FROM calories WHERE UID="+"'"+UID+"'"+"ORDER BY time DESC;", null);
+        return database.rawQuery("SELECT _id, name, calorie, time, UID FROM calories WHERE UID="+"'"+UID+"'"+"ORDER BY time DESC;", null);
+    }
+    public Cursor getAllItemsWithoutUID(String UID) {
+        // https://stackoverflow.com/questions/16977230/how-to-convert-milliseconds-to-date-in-sqlite
+        return database.rawQuery("SELECT _id, name, calorie, datetime(time/1000, 'unixepoch') AS time FROM calories WHERE UID="+"'"+UID+"'"+"ORDER BY time DESC;", null);
+    }
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public Cursor getAllItemsToday(String UID) {
+        LocalDate currentdate = LocalDate.now();
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.MONTH, currentdate.getMonthValue()-1);
+        c.set(Calendar.YEAR, currentdate.getYear());
+        c.set(Calendar.DAY_OF_MONTH, currentdate.getDayOfMonth());
+        c.set(Calendar.HOUR, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+
+        Log.d("date", c.getTime().toString());
+
+        long timeFrom12AM = c.getTimeInMillis();
+        return database.rawQuery("SELECT _id, name, calorie, time, UID FROM calories WHERE UID="+"'"+UID+"'"+" AND time > " + timeFrom12AM + " ORDER BY time DESC;", null);
+    }
+
+    public ArrayList<Calorie> getCalories(String UID)
+    {
+        ArrayList<Calorie> list = new ArrayList<Calorie>();
+        this.openReadableDB();
+        Cursor cursor = getAllItems(UID);
+        while (cursor.moveToNext())
+        {
+            int id = cursor.getInt(0);
+            String name = cursor.getString(1);
+            double calorie = cursor.getDouble(2);
+            long time = cursor.getLong(3);
+
+            list.add(new Calorie(id, time, name, calorie, UID));
+
+
+        }
+        if (cursor != null){
+            cursor.close();
+        }
+        close(); //close the database
+        return list;
+    }
+    public ArrayList<Calorie> getCaloriesToday(String UID)
+    {
+        ArrayList<Calorie> list = new ArrayList<Calorie>();
+        this.openReadableDB();
+        Cursor cursor = getAllItemsToday(UID);
+        while (cursor.moveToNext())
+        {
+            int id = cursor.getInt(0);
+            String name = cursor.getString(1);
+            double calorie = cursor.getDouble(2);
+            long time = cursor.getLong(3);
+
+            list.add(new Calorie(id, time, name, calorie, UID));
+
+
+        }
+        if (cursor != null){
+            cursor.close();
+        }
+        close(); //close the database
+        return list;
     }
 
 
@@ -76,7 +161,6 @@ public class DatabaseConnector {
     public void deleteItem(long id) {
         open();
         database.delete("calories", "_id=" + id, null);
-        /*OR*/ //database.delete("contacts", "_id = ?", new String[] {String.valueOf(id)});
         close();
     }
 
