@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,8 +19,13 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class CalorieActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -68,7 +74,7 @@ public class CalorieActivity extends AppCompatActivity implements View.OnClickLi
                 float carbsV = Float.parseFloat(carbs_et.getText().toString());
                 String foodName = food_name_et.getText().toString();
                 double calories = 9*fatV + 4*proteinV + 4*carbsV;
-                db.insertItem(foodName, calories, getIntent().getStringExtra("UID"), Calendar.getInstance().getTimeInMillis());
+                db.insertItem(foodName, calories, getIntent().getStringExtra("UID"), System.currentTimeMillis());
                 updateUI();
             }
             catch (Exception e)

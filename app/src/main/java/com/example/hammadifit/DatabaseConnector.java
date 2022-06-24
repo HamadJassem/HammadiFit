@@ -92,7 +92,7 @@ public class DatabaseConnector {
     }
     public Cursor getAllItemsWithoutUID(String UID) {
         // https://stackoverflow.com/questions/16977230/how-to-convert-milliseconds-to-date-in-sqlite
-        return database.rawQuery("SELECT _id, name, calorie, datetime(time/1000, 'unixepoch') AS time FROM calories WHERE UID="+"'"+UID+"'"+"ORDER BY time DESC;", null);
+        return database.rawQuery("SELECT _id, name, calorie, datetime(time/1000, 'unixepoch', 'localtime') AS time FROM calories WHERE UID="+"'"+UID+"'"+"ORDER BY time DESC;", null);
     }
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Cursor getAllItemsToday(String UID) {
