@@ -200,6 +200,13 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
                 double newDistance = totalDistance + prevDistance;
                 //save back again (update)
                 step.distance = newDistance;
+
+                int prevSteps = step.steps;
+                int newSteps = sp_counter.getInt("counter", 0) + prevSteps;
+
+                step.steps = newSteps;
+
+
                 db.open();
                 db.updateStep(step);
                 db.close();
@@ -216,6 +223,9 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
             stopTimer();
             stopWalking.setEnabled(false);
             startWalking.setEnabled(true);
+            SharedPreferences.Editor e = sp_counter.edit();
+            e.putInt("counter", 0);
+            e.commit();
 
         }
     }

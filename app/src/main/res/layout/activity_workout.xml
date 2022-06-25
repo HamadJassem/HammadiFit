@@ -27,7 +27,7 @@
             android:layout_height="150dp"
             android:layout_gravity="center"
             android:layout_margin="10dp"
-            android:src="@drawable/workout_icon"
+            android:src="@drawable/beginner_icon"
             app:srcCompat="@drawable/beginner_icon" />
 
         <TextView
@@ -64,7 +64,7 @@
             android:layout_height="150dp"
             android:layout_gravity="center"
             android:layout_margin="10dp"
-            android:src="@drawable/workout_icon"
+            android:src="@drawable/intermediate_icon"
             app:srcCompat="@drawable/intermediate_icon" />
 
         <TextView
@@ -101,7 +101,7 @@
             android:layout_height="150dp"
             android:layout_gravity="center"
             android:layout_margin="10dp"
-            android:src="@drawable/workout_icon"
+            android:src="@drawable/expert_icon"
             app:srcCompat="@drawable/expert_icon" />
 
         <TextView
