@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -166,8 +167,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void updateUI() {
         try { //try catch needed in case loggedUser is null.
             msg_tv.setText("Hello, " + loggedUser.username);
+            FitApplication app = (FitApplication) getApplication();
+            //set UID in the application
+            app.setUID(mAuth.getUid());
             pbHome.setVisibility(View.GONE);
-
         }
         catch (Exception e)
         {
@@ -181,6 +184,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch(v.getId())
         {
             case R.id.CardWalk:
+                if(loggedUser != null)
+                {
+                    Intent WalkAct = new Intent(this, WalkActivity.class);
+                    WalkAct.putExtra("UID", mAuth.getUid());
+                    startActivity(WalkAct);
+                }
                 break;
             case R.id.CardWorkout:
                 break;
@@ -198,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 else
                 {
-                    Toast.makeText(this, "wait", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "wait for user to load", Toast.LENGTH_SHORT).show();
                 }
 
 

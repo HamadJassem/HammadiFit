@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,6 +36,7 @@ public class CalorieActivity extends AppCompatActivity implements View.OnClickLi
     ProgressBar pb;
     TextView consumed_tv;
     String UID;
+    SharedPreferences formValues_sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +59,33 @@ public class CalorieActivity extends AppCompatActivity implements View.OnClickLi
 
         db = new DatabaseConnector(this);
 
+        formValues_sp = getSharedPreferences("formvalues", MODE_PRIVATE);
+
 
     }
 
     protected void onStart() {
         super.onStart();
         updateUI(); //incase user backs off from history after deleting an item...
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fat_et.setText(formValues_sp.getString("fat", ""));
+        protein_et.setText(formValues_sp.getString("protein", ""));
+        carbs_et.setText(formValues_sp.getString("carbs", ""));
+        food_name_et.setText(formValues_sp.getString("food", ""));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor = formValues_sp.edit();
+        editor.putString("fat", fat_et.getText().toString());
+        editor.putString("protein", protein_et.getText().toString());
+        editor.putString("carbs", carbs_et.getText().toString());
+        editor.putString("food", food_name_et.getText().toString());
+        editor.commit();
     }
 
     @Override

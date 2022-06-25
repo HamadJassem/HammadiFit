@@ -55,7 +55,7 @@ public class DatabaseConnector {
             database.close(); // close the database connection
     }
 
-    // inserts a new contact in the database
+    // inserts a new calorie in the database
     public void insertItem(String name, double calorie, String uid, long time) {
         ContentValues newItem = new ContentValues();
         newItem.put("name", name);
@@ -68,25 +68,8 @@ public class DatabaseConnector {
         close(); // close the database
     }
 
-    // inserts a new contact in the database
-    public void updateContact(long id, String name, String email,
-                              String phone, String state, String city) {
-        ContentValues editContact = new ContentValues();
-        editContact.put("name", name);
-        editContact.put("email", email);
-        editContact.put("phone", phone);
-        editContact.put("street", state);
-        editContact.put("city", city);
 
-        open(); // open the database
-        database.update("contacts", editContact, "_id=" + id, null);
-        close(); // close the database
-    }
 
-    // return a Cursor with all contact information in the database
-    public Cursor getAllItems() {
-        return database.rawQuery("SELECT _id, name, calorie, time FROM calories ORDER BY time DESC;", null);
-    }
     public Cursor getAllItems(String UID) {
         return database.rawQuery("SELECT _id, name, calorie, time, UID FROM calories WHERE UID="+"'"+UID+"'"+"ORDER BY time DESC;", null);
     }
@@ -115,7 +98,7 @@ public class DatabaseConnector {
     public Cursor getAggregatedItemsWeekly(String UID)
     {
         return database.rawQuery(
-                "SELECT Date(datetime(time/1000, 'unixepoch')) AS timeAGG, sum(calorie) AS calorieSUM \n" +
+                "SELECT Date(datetime(time/1000, 'unixepoch', 'localtime')) AS timeAGG, sum(calorie) AS calorieSUM \n" +
                 "FROM calories\n" +
                 "WHERE UID= '"+UID+"' \n" +
                 "GROUP BY timeAGG\n" +
@@ -233,6 +216,110 @@ public class DatabaseConnector {
     }
 
 
+
+    public void insertLocation(Location location, String UID) {
+        ContentValues newItem = new ContentValues();
+        newItem.put("latitude", location.getLatitude());
+        newItem.put("longitude", location.getLongitude());
+        newItem.put("time", location.getTime());
+        newItem.put("uid", UID);
+        open(); // open the database
+        database.insert("locations", null, newItem);
+        close(); // close the database
+    }
+    //reference runtracker app
+    public Location getLastLocation()
+    {
+        Location loc = null;
+        this.openReadableDB();
+        Cursor cursor = database.rawQuery("SELECT * from LOCATIONS WHERE _id = (SELECT MAX(_id) from LOCATIONS)",null);
+        if (cursor.moveToFirst()){
+            double latitude = cursor.getDouble(1);
+            double longitude = cursor.getDouble(2);
+            long time = cursor.getLong(3);
+            loc = new Location("GPS");
+            loc.setLatitude(latitude);
+            loc.setLongitude(longitude);
+            loc.setTime(time);
+        }
+        if (cursor != null){
+            cursor.close();
+        }
+        this.close();
+        return loc;
+    }
+    public StepDistance getStepsByDate(String date, String UID)
+    {
+        StepDistance step = null;
+        this.openReadableDB();
+        Cursor cursor = database.rawQuery("SELECT * FROM distances WHERE date = '"+date+"' AND UID = '"+UID + "';", null);
+        if(cursor.moveToFirst())
+        {
+            step = new StepDistance(cursor.getInt(0), cursor.getDouble(1), cursor.getInt(2), cursor.getString(3), cursor.getString(4));
+        }
+        if(cursor != null)
+        {
+            cursor.close();
+        }
+        this.close();
+        return step;
+    }
+    // use all locations to find distance between all adjacent points -> add and get total distance
+    public ArrayList<Location> getLocations(String UID)
+    {
+        ArrayList<Location> list = new ArrayList<Location>();
+        this.openReadableDB();
+        Cursor cursor = database.rawQuery("SELECT * FROM LOCATIONS WHERE UID = '" + UID + "';", null);
+
+        while (cursor.moveToNext())
+        {
+            double latitude = cursor.getDouble(1);
+            double longitude = cursor.getDouble(2);
+            long time = cursor.getLong(3);
+
+            Location loc = new Location("GPS");
+            loc.setLatitude(latitude);
+            loc.setLongitude(longitude);
+            loc.setTime(time);
+
+            list.add(loc);
+        }
+        if (cursor != null){
+            cursor.close();
+        }
+        close(); //close the database
+        return list;
+    }
+
+    public void deleteLocations()
+    {
+        this.openWriteableDB();
+        database.delete("LOCATIONS", null, null);
+        this.close();
+    }
+
+    public void updateStep(StepDistance stepdistance)
+    {
+        ContentValues content = new ContentValues();
+        content.put("distance", stepdistance.distance);
+        content.put("steps", stepdistance.steps);
+        content.put("date", stepdistance.date);
+        content.put("UID", stepdistance.UID);
+        database.update("distances", content, "_id="+stepdistance._id, null);
+    }
+    public void insertStep(StepDistance stepdistance)
+    {
+        ContentValues content = new ContentValues();
+        content.put("distance", stepdistance.distance);
+        content.put("steps", stepdistance.steps);
+        content.put("date", stepdistance.date);
+        content.put("UID", stepdistance.UID);
+        open();
+        database.insert("distances", null, content);
+        close();
+    }
+
+
     private class DatabaseOpenHelper extends SQLiteOpenHelper {
         // public constructor
         public DatabaseOpenHelper(Context context, String name,
@@ -240,7 +327,7 @@ public class DatabaseConnector {
             super(context, name, factory, version);
         }
 
-        // creates the contacts table when the database is created
+        // creates calories, locations, distances tables when the database is created
         // TS: this is called from  open()->getWritableDatabase(). Only if the database does not exist
         @Override
         public void onCreate(SQLiteDatabase db) {
@@ -251,6 +338,12 @@ public class DatabaseConnector {
                     "time INTEGER);";
 
             db.execSQL(createQuery); // execute the query
+            // uses runtracker's template for calculating distance walked
+            String createQuery2 = "CREATE TABLE locations(_id integer primary key autoincrement, latitude REAL, longitude REAL, time INTEGER, UID TEXT);";
+            db.execSQL(createQuery2);
+            // track users daily distance and steps covered
+            String createQuery3 = "CREATE TABLE distances(_id integer primary key autoincrement, distance REAL, steps INTEGER, date TEXT, UID TEXT);";
+            db.execSQL(createQuery3);
         }
 
         @Override
