@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -28,6 +29,8 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import android.location.Location;
+import android.widget.Toast;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -38,6 +41,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.security.Permission;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -71,14 +75,6 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
         super.onStart();
         googleApiClient.connect();
     }
-    @Override
-    protected void onStop()
-    {
-        googleApiClient.disconnect();
-        Intent fitService = new Intent(this, FitMapService.class);
-        stopService(fitService);
-        super.onStop();
-    }
 
 
     @Override
@@ -98,12 +94,7 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
         startWalking.setEnabled(false);
         stopWalking.setEnabled(false);
 
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        if(stepCounter != null) // check if step counter exist in the device
-        {
-            sensorManager.registerListener(this, stepCounter,SensorManager.SENSOR_DELAY_FASTEST);
-        }
+
         sp_counter = getSharedPreferences("stepcounter", MODE_PRIVATE);
 
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -116,9 +107,32 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
                 .setInterval(UPDATE_INTERVAL)
                 .setFastestInterval(FASTEST_UPDATE_INTERVAL);
 
+        db = new DatabaseConnector(this);
+
 
 
     }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        checkActivityRecognition();
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        if(stepCounter != null) // check if step counter exist in the device
+        {
+            sensorManager.registerListener(this, stepCounter,SensorManager.SENSOR_DELAY_FASTEST);
+        }
+    }
+
+    private void checkActivityRecognition() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACTIVITY_RECOGNITION) != (int) PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACTIVITY_RECOGNITION }, 354);
+        }
+    }
+
     public static double distance(double lat1,
                                   double lat2, double lon1,
                                   double lon2)
@@ -141,8 +155,6 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
 
         double c = 2 * Math.asin(Math.sqrt(a));
 
-        // Radius of earth in kilometers. Use 3956
-        // for miles
         double r = 6371;
 
         // calculate the result
@@ -156,11 +168,13 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
             Intent fitService = new Intent(this, FitMapService.class);
             ContextCompat.startForegroundService(this, fitService);
             startTimer();
+            startWalking.setEnabled(false);
+            stopWalking.setEnabled(true);
         }
         else if(v.getId() == R.id.buttonStopWalking)
         {
             SessionRunning = false;
-            db = new DatabaseConnector(this);
+
             //get all locations within the walk first
             ArrayList<Location> locs = db.getLocations(UID);
             //get today's date in yyyy-mm-dd
@@ -200,6 +214,8 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
             Intent fitService = new Intent(this, FitMapService.class);
             stopService(fitService);
             stopTimer();
+            stopWalking.setEnabled(false);
+            startWalking.setEnabled(true);
 
         }
     }
@@ -222,13 +238,15 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR && SessionRunning)
+
+
+        if(event.sensor.getType() == Sensor.TYPE_STEP_COUNTER && SessionRunning)
         {
             int totalSteps = sp_counter.getInt("counter", 0) + 1;
             SharedPreferences.Editor e = sp_counter.edit();
             e.putInt("counter", totalSteps);
             e.commit();
-            steps_tv.setText(totalSteps+"");
+            updateUI();
         }
     }
 
@@ -241,6 +259,21 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
             long min = (second / 60) % 60;
             long hour = (second / (60 * 60));
             timer_tv.setText(""+hour+":"+min+":"+sec);
+            steps_tv.setText("Steps: "+ sp_counter.getInt("counter", 0));
+            ArrayList<Location> locs = db.getLocations(UID);
+            double totalDistance = 0;
+            for(int i = 0; i<locs.size()-1; i++) //classic O(n) algorithm, compares all adjacent points in one pass
+            {
+                LatLng thisPoint = new LatLng(locs.get(i).getLatitude(), locs.get(i).getLongitude());
+                LatLng nextPoint = new LatLng(locs.get(i+1).getLatitude(), locs.get(i+1).getLongitude());
+                double distance = distance(thisPoint.latitude, nextPoint.latitude, thisPoint.longitude, nextPoint.longitude); //O(1)
+                totalDistance += distance;
+            }
+            distance_tv.setText(totalDistance + "km");
+
+
+
+
         }catch (Exception e)
         {
             //pass
@@ -261,11 +294,11 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
         {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},123);
         }
+
         try {
             Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (location != null) {
                 startWalking.setEnabled(true);
-                stopWalking.setEnabled(true);
             }
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }    catch (SecurityException s){
@@ -276,6 +309,9 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
          if (requestCode == 123)
              if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                  onConnected(new Bundle());
+         else if(requestCode == 354)
+                 if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                     checkActivityRecognition();
      }
 
 

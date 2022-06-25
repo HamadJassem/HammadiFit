@@ -83,6 +83,7 @@ public class FitMapService extends Service implements GoogleApiClient.Connection
 
         FitApplication app = (FitApplication) getApplication();
         app.setStartTime(System.currentTimeMillis());
+        googleApiClient.connect();
 
         return super.onStartCommand(intent, flags, startId);
     }
