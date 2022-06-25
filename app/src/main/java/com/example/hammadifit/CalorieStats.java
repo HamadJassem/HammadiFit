@@ -16,6 +16,7 @@ import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -105,8 +106,12 @@ public class CalorieStats extends AppCompatActivity {
         BarData bardata = new BarData();
         bardata.addDataSet(barset);
         FoodPie.setData(data);
+        Description pieDescr = new Description();
+        pieDescr.setText("Daily Intake Category");
+        FoodPie.setDescription(pieDescr);
         FoodPie.invalidate();
         FoodPie.animateY(1500, Easing.EaseInQuad);
+
 
         FoodBar.setData(bardata);
         FoodBar.invalidate();
@@ -116,6 +121,10 @@ public class CalorieStats extends AppCompatActivity {
                 return BarXValues.get((int) value);
             }
         });
+
+        Description barDescr = new Description();
+        pieDescr.setText("Weekly Intake Distribution");
+        FoodPie.setDescription(barDescr);
         FoodBar.animateY(1500, Easing.EaseInQuad);
 
 

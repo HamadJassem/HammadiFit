@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,8 +38,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private User loggedUser = null;
     FirebaseUser currentUser = null;
     TextView msg_tv;
+    ProgressBar pbHome;
 
-    ImageButton buttonWorkout, buttonCalorie, buttonSteps;
+
+
+    CardView buttonWorkout, buttonCalorie, buttonSteps;
 
 
     @Override
@@ -45,18 +50,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        msg_tv = findViewById(R.id.textViewMain);
+        msg_tv = findViewById(R.id.TextViewNameUser);
+        pbHome = findViewById(R.id.progressBarHome);
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        buttonCalorie = findViewById(R.id.imageButtonCalorie);
-        buttonWorkout = findViewById(R.id.imageButtonWorkout);
-        buttonSteps = findViewById(R.id.imageButtonSteps);
+        buttonCalorie = findViewById(R.id.CardCalorie);
+        buttonWorkout = findViewById(R.id.CardWorkout);
+        buttonSteps = findViewById(R.id.CardWalk);
 
         buttonCalorie.setOnClickListener(this);
         buttonWorkout.setOnClickListener(this);
         buttonSteps.setOnClickListener(this);
+
+
 
 
 
@@ -158,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void updateUI() {
         try { //try catch needed in case loggedUser is null.
             msg_tv.setText("Hello, " + loggedUser.username);
+            pbHome.setVisibility(View.GONE);
+
         }
         catch (Exception e)
         {
@@ -170,11 +180,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch(v.getId())
         {
-            case R.id.imageButtonWorkout:
+            case R.id.CardWalk:
                 break;
-            case R.id.imageButtonSteps:
+            case R.id.CardWorkout:
                 break;
-            case R.id.imageButtonCalorie:
+            case R.id.CardCalorie:
                 if(loggedUser != null)
                 {
                     Intent CalorieAct = new Intent(this, CalorieActivity.class);
