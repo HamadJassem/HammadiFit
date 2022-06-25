@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".WorkoutActivity">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/CardBeginner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        app:cardBackgroundColor="@android:color/holo_green_light"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="10dp"
+        app:cardMaxElevation="12dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true">
+
+        <ImageView
+            android:id="@+id/imgBeginner"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:src="@drawable/workout_icon"
+            app:srcCompat="@drawable/beginner_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:text="Beginner"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:translationY="15dp" />
+
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/CardIntermediate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        app:cardBackgroundColor="#FF9800"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="10dp"
+        app:cardMaxElevation="12dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true">
+
+        <ImageView
+            android:id="@+id/imgIntermediate"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:src="@drawable/workout_icon"
+            app:srcCompat="@drawable/intermediate_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:text="Intermediate"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:translationY="15dp" />
+
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/CardExpert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        app:cardBackgroundColor="#E91E1E"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="10dp"
+        app:cardMaxElevation="12dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true">
+
+        <ImageView
+            android:id="@+id/imgExpert"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:src="@drawable/workout_icon"
+            app:srcCompat="@drawable/expert_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:text="Expert"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:translationY="15dp" />
+
+
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

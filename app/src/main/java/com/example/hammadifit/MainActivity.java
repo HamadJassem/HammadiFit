@@ -192,6 +192,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.CardWorkout:
+                Intent WorkOutAct = new Intent(this, WorkoutActivity.class);
+                startActivity(WorkOutAct);
                 break;
             case R.id.CardCalorie:
                 if(loggedUser != null)
