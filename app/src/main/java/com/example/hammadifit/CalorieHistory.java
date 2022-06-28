@@ -14,6 +14,7 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+// simple activity to remove and check calories
 public class CalorieHistory extends AppCompatActivity {
 
 
@@ -21,6 +22,7 @@ public class CalorieHistory extends AppCompatActivity {
     private CursorAdapter foodAdapter;
     String UID;
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calorie_history);

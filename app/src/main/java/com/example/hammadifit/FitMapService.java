@@ -65,6 +65,7 @@ public class FitMapService extends Service implements GoogleApiClient.Connection
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        //creates foreground service once the service starts
         NotificationChannel notificationChannel = new NotificationChannel("Channel_ID", "My Notifications", NotificationManager.IMPORTANCE_DEFAULT);
         NotificationManager manager = (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
         manager.createNotificationChannel(notificationChannel);
@@ -98,6 +99,7 @@ public class FitMapService extends Service implements GoogleApiClient.Connection
     public void onLocationChanged(Location location)
     {
         if (location != null){
+            //inserts location corresponding to the user
             db.insertLocation(location, ((FitApplication)getApplication()).getUID());
         }
     }

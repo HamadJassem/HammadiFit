@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.Locale;
 
 // https://www.youtube.com/watch?v=S3zqxVoIUig
-
+// Activity for displaying charts (pie chart and bar chart for weekly and daily intake)
 public class CalorieStats extends AppCompatActivity {
 
     PieChart FoodPie;
@@ -55,7 +55,7 @@ public class CalorieStats extends AppCompatActivity {
         FoodBar = findViewById(R.id.calorieStatsBarChart);
 
         db = new DatabaseConnector(this);
-
+        // creates three arraylists, one for pie chart values, barchart y values, and barchart x values
         ArrayList<PieEntry> entries = new ArrayList<>();
         ArrayList<BarEntry> barEntries = new ArrayList<>();
         ArrayList<String> BarXValues = new ArrayList<>();
@@ -68,15 +68,13 @@ public class CalorieStats extends AppCompatActivity {
         }
         for(Pair<String, Double> item : items)
         {
-            entries.add(new PieEntry((float)(item.second / sum), item.first)); //calculating % from sum
+            entries.add(new PieEntry((float)(item.second / sum), item.first)); //calculating proportion from sum
         }
         // populating bar chart entries
         items = db.getAggregatedCaloriesWeekly(getIntent().getStringExtra("UID"));
 
 
-
-
-        //reading from reverse because the given order is descending
+        //reading from reverse because the given order is descending, but we want it to show from beginning to end.
         Collections.reverse(items);
         int i = 0;
         for(Pair<String, Double> item : items)
@@ -84,27 +82,27 @@ public class CalorieStats extends AppCompatActivity {
             barEntries.add(new BarEntry(i++, Math.round(item.second)));
             BarXValues.add(LocalDate.parse(item.first).getDayOfWeek().toString());
         }
-
-
-
+        // colors for pie chart
         ArrayList<Integer> colors = new ArrayList<>();
         for(int color : ColorTemplate.MATERIAL_COLORS)
             colors.add(color);
         for(int color : ColorTemplate.VORDIPLOM_COLORS)
             colors.add(color);
-
+        //giving title for pie chart and setting formatting for the pie chart
         PieDataSet dataSet = new PieDataSet(entries, "Food Category");
         dataSet.setColors(colors);
         PieData data = new PieData(dataSet);
         data.setDrawValues(true);
         data.setValueFormatter(new PercentFormatter(FoodPie));
-        data.setValueTextSize(12f);
+        data.setValueTextSize(18f);
         data.setValueTextColor(Color.BLACK);
 
-
+        //populating bar chart
         BarDataSet barset = new BarDataSet(barEntries, "Weekly Calories");
         BarData bardata = new BarData();
         bardata.addDataSet(barset);
+
+        //populating pie chart by setting the foodpie view dataset to the one we created above (data)
         FoodPie.setData(data);
         Description pieDescr = new Description();
         pieDescr.setText("Daily Intake Category");
@@ -112,18 +110,18 @@ public class CalorieStats extends AppCompatActivity {
         FoodPie.invalidate();
         FoodPie.animateY(1500, Easing.EaseInQuad);
 
-
+        //.... similar as above
         FoodBar.setData(bardata);
         FoodBar.invalidate();
         FoodBar.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
-            public String getFormattedValue(float value) {
+            public String getFormattedValue(float value) { //formatting x values for bar chart, a bit buggy because of the library
                 return BarXValues.get((int) value);
             }
         });
 
         Description barDescr = new Description();
-        pieDescr.setText("Weekly Intake Distribution");
+        pieDescr.setText("Weekly Intake Distribution"); //for some reasons it doesnt show (BUG)
         FoodPie.setDescription(barDescr);
         FoodBar.animateY(1500, Easing.EaseInQuad);
 

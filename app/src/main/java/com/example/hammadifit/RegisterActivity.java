@@ -64,6 +64,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
     @Override
     public void onClick(View v) {
+        // gets input and validates input
         if(v.getId() == R.id.buttonRegister)
         {
             String email = email_et.getText().toString();
@@ -75,8 +76,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             boolean gender = (rbmale.isChecked() == true ? true : false);
             if(email.trim().isEmpty())
             {
-                email_et.setError("Fill this field please");
-                email_et.requestFocus();
+                email_et.setError("Fill this field please"); // following code shows a red marker on the field that was mistaken
+                email_et.requestFocus(); // then focuses on that field to allow the user to re-enter the values
             }
             else if(password.trim().isEmpty())
             {
@@ -106,7 +107,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             else
             {
                 try
-                { //TODO add validation for Existing user and email
+                {
                     float heightF = Float.parseFloat(height);
                     float weightF = Float.parseFloat(weight);
                     int ageI = Integer.parseInt(age);
@@ -114,10 +115,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     {
                         throw new Exception();
                     }
+                    // first checks if username exists
                     mDatabase.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if(!snapshot.exists()) // check if username does not exist
+                            if(!snapshot.exists()) // if username doesnt exist, then register the user with the given attribute
                             {
                                 mAuth.createUserWithEmailAndPassword(email, password)
                                         .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
@@ -146,7 +148,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                             }
                                         });
                             }
-                            else
+                            else // if username exists, then an error will show
                             {
                                 username_et.setError("Username Exists");
                                 username_et.requestFocus();
@@ -161,7 +163,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
 
                 }
-                catch (Exception e)
+                catch (Exception e) // if validation errors happen a toast message will occur. ex.. leaving dot in height or weight.
                 {
                     Toast.makeText(getApplicationContext(), "Invalid Input in either of Height, Weight, Age..", Toast.LENGTH_SHORT).show();
                 }

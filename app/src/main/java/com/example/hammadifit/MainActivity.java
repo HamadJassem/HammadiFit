@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else
         {
+            //gets the node from firebase which contains the logged in user and adds an on complete listener that obtains the username
             mDatabase.child("uids").child(currentUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
             });
+            //once the username is obtained, fetch the rest of the attributes...
             mDatabase.child("users").child(userId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -156,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     profile.putExtra("gender", loggedUser.gender);
                     profile.putExtra("height", loggedUser.height);
                     profile.putExtra("weight", loggedUser.weight);
+                    profile.putExtra("UID", mAuth.getUid());
                     startActivity(profile);
                 }
             default:

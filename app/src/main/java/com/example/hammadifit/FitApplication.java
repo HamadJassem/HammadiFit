@@ -19,6 +19,6 @@ public class FitApplication extends Application {
         this.startTime = startTime;
     }
 
-    private long startTime = -1;
-    private String UID = "";
+    private long startTime = -1; // saves start time for walk excercises
+    private String UID = ""; // saves uid throughout the app
 }

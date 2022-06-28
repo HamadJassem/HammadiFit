@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+// sources for workouts : https://github.com/wrkout/exercises.json
+
 public class ExcerciseDetailActivity extends AppCompatActivity {
 
     ImageView im1, im2;
@@ -39,12 +41,13 @@ public class ExcerciseDetailActivity extends AppCompatActivity {
         title_tv.setText(getIntent().getStringExtra("name"));
         description_tv.setText(getIntent().getStringExtra("description"));
 
-
+        // runs two threads to download the pictures on parallel
         new  picDownloadTask(getIntent().getStringExtra("link")+"0.jpg", im1).execute(pic0);
         new  picDownloadTask(getIntent().getStringExtra("link")+"1.jpg", im2).execute(pic1);
 
     }
 
+    // reference from rss feed FILEIO class, but modified to download pictures
     class picDownloadTask extends AsyncTask<String, Void, String>
     {
         picDownloadTask(String FILENAME, ImageView im){this.filename = FILENAME; this.im = im;}
@@ -90,6 +93,7 @@ public class ExcerciseDetailActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             try {
+                //gets stream, converts to bitmap, then assigns image view the picture
                 InputStream in = getApplicationContext().openFileInput(filename);
                 pic = BitmapFactory.decodeStream(in);
                 im.setImageBitmap(pic);

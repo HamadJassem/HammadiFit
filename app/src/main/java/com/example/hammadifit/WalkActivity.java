@@ -190,7 +190,7 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
                 double distance = distance(thisPoint.latitude, nextPoint.latitude, thisPoint.longitude, nextPoint.longitude); //O(1)
                 totalDistance += distance;
             }
-            //check if data of the day already exists
+            //check if data of the day already exists (update)
             StepDistance step = db.getStepsByDate(date, UID);
             if(step != null)
             {
@@ -211,7 +211,7 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
                 db.updateStep(step);
                 db.close();
             }
-            else //if it doesnt exist
+            else //if it doesnt exist (insert)
             {
                 //save directly
                 step = new StepDistance(0, totalDistance, sp_counter.getInt("counter", 0), date, UID);
@@ -224,13 +224,13 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
             stopWalking.setEnabled(false);
             startWalking.setEnabled(true);
             SharedPreferences.Editor e = sp_counter.edit();
-            e.putInt("counter", 0);
+            e.putInt("counter", 0); // changes counter to 0, in case current user logs out and another user logs in. or when the user starts another session.
             e.commit();
 
         }
     }
 
-    private void startTimer() {
+    private void startTimer() { // timer for stop watch like interface
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -250,12 +250,12 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
     public void onSensorChanged(SensorEvent event) {
 
 
-        if(event.sensor.getType() == Sensor.TYPE_STEP_COUNTER && SessionRunning)
+        if(event.sensor.getType() == Sensor.TYPE_STEP_COUNTER && SessionRunning) // if the timer is running & the user is walking
         {
-            int totalSteps = sp_counter.getInt("counter", 0) + 1;
+            int totalSteps = sp_counter.getInt("counter", 0) + 1; // get the counter from the shared preference and increment by 1
             SharedPreferences.Editor e = sp_counter.edit();
             e.putInt("counter", totalSteps);
-            e.commit();
+            e.commit(); // save the counter back to the shared preferences
             updateUI();
         }
     }
@@ -264,13 +264,13 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
     {
         try
         {
-            long second = ((System.currentTimeMillis() - ((FitApplication) getApplication()).getStartTime()) / 1000L) ;
+            long second = ((System.currentTimeMillis() - ((FitApplication) getApplication()).getStartTime()) / 1000L) ; // calculation for getting the total seconds by subtracting current time - start time
             long sec = second % 60;
             long min = (second / 60) % 60;
-            long hour = (second / (60 * 60));
+            long hour = (second / 3600);
             timer_tv.setText(""+hour+":"+min+":"+sec);
             steps_tv.setText("Steps: "+ sp_counter.getInt("counter", 0));
-            ArrayList<Location> locs = db.getLocations(UID);
+            ArrayList<Location> locs = db.getLocations(UID); // get all locations
             double totalDistance = 0;
             for(int i = 0; i<locs.size()-1; i++) //classic O(n) algorithm, compares all adjacent points in one pass
             {
@@ -279,7 +279,17 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
                 double distance = distance(thisPoint.latitude, nextPoint.latitude, thisPoint.longitude, nextPoint.longitude); //O(1)
                 totalDistance += distance;
             }
-            distance_tv.setText(totalDistance + "km");
+
+            //total distance is in KM, we want to convert to m if its less than 1
+            if(totalDistance < 1.0)
+            {
+                distance_tv.setText(String.format("%.3f", totalDistance*1000) + "m");
+            }
+            else //set km to precision of 2 digits
+            {
+                distance_tv.setText(String.format("%.2f", totalDistance) + "km");
+            }
+
 
 
 
@@ -298,7 +308,7 @@ public class WalkActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onConnected(Bundle dataBundle){
+    public void onConnected(Bundle dataBundle){ //obtain permissions for both location & pedometer step counter sensor
         // Check Permissions Now
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {

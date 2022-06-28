@@ -18,13 +18,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
+// code snippet taken from the slides & the run tracker app. (ill leave the comments as they are)
 public class DatabaseConnector {
     // database name
     private static final String DATABASE_NAME = "FitnessApp";
     private SQLiteDatabase database; // TS: to run SQL commands
     private DatabaseOpenHelper databaseOpenHelper; // TS: create or open the database
-    private final long DAY = 86400000;
 
     // public constructor for DatabaseConnector
     public DatabaseConnector(Context context) {
@@ -69,19 +68,28 @@ public class DatabaseConnector {
     }
 
 
+    //String UID is used in each method signature for multi authentication
 
+    // get all calories from the table that contains the given UID
     public Cursor getAllItems(String UID) {
         return database.rawQuery("SELECT _id, name, calorie, time, UID FROM calories WHERE UID="+"'"+UID+"'"+"ORDER BY time DESC;", null);
     }
+
+    //gets all the items without the UID to use for the calorie history list view (one to one mapping)
+    // id->list position
+    // name, calorie, and timestamp
     public Cursor getAllItemsWithoutUID(String UID) {
         // https://stackoverflow.com/questions/16977230/how-to-convert-milliseconds-to-date-in-sqlite
         return database.rawQuery("SELECT _id, name, calorie, datetime(time/1000, 'unixepoch', 'localtime') AS time FROM calories WHERE UID="+"'"+UID+"'"+"ORDER BY time DESC;", null);
     }
+    //@requiresapi is there because it was raising weird errors
+    // method returns all the items of today ex now is 6:45 am, start of day is 00:00AM which is 12AM
+    //thus it will keep the progress bar in the calorie activity active of tracking daily calories for 24hrs
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Cursor getAllItemsToday(String UID) {
         LocalDate currentdate = LocalDate.now();
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.MONTH, currentdate.getMonthValue()-1);
+        c.set(Calendar.MONTH, currentdate.getMonthValue()-1); //january begins from 0
         c.set(Calendar.YEAR, currentdate.getYear());
         c.set(Calendar.DAY_OF_MONTH, currentdate.getDayOfMonth());
         c.set(Calendar.HOUR, 0);
@@ -90,13 +98,14 @@ public class DatabaseConnector {
 
         Log.d("date", c.getTime().toString());
 
-        long timeFrom12AM = c.getTimeInMillis();
-        return database.rawQuery("SELECT _id, name, calorie, time, UID FROM calories WHERE UID="+"'"+UID+"'"+" AND time > " + timeFrom12AM + " ORDER BY time DESC;", null);
+        long timeFrom12AM = c.getTimeInMillis(); //gets 12AM
+        return database.rawQuery("SELECT _id, name, calorie, time, UID FROM calories WHERE UID="+"'"+UID+"'"+" AND time > " + timeFrom12AM + " ORDER BY time DESC;", null); //anything greater than today's 12am
     }
 
 
-    public Cursor getAggregatedItemsWeekly(String UID)
+    public Cursor getAggregatedItemsWeekly(String UID)  // groups the sum of calories per date then restricts to last 7 days by ordering descending in terms of date
     {
+
         return database.rawQuery(
                 "SELECT Date(datetime(time/1000, 'unixepoch', 'localtime')) AS timeAGG, sum(calorie) AS calorieSUM \n" +
                 "FROM calories\n" +
@@ -107,6 +116,7 @@ public class DatabaseConnector {
                 "\n ", null);
     }
 
+    //gets items for today to use in generating the pie chart
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Cursor getAggregatedItemsToday(String UID) {
         LocalDate currentdate = LocalDate.now();
@@ -124,28 +134,7 @@ public class DatabaseConnector {
         return database.rawQuery("SELECT name, sum(calorie) AS calorieSum FROM (SELECT _id, name, calorie, time, UID FROM calories WHERE UID="+"'"+UID+"'"+" AND time > " + timeFrom12AM + ") GROUP BY name", null);
     }
 
-    public ArrayList<Calorie> getCalories(String UID)
-    {
-        ArrayList<Calorie> list = new ArrayList<Calorie>();
-        this.openReadableDB();
-        Cursor cursor = getAllItems(UID);
-        while (cursor.moveToNext())
-        {
-            int id = cursor.getInt(0);
-            String name = cursor.getString(1);
-            double calorie = cursor.getDouble(2);
-            long time = cursor.getLong(3);
-
-            list.add(new Calorie(id, time, name, calorie, UID));
-
-
-        }
-        if (cursor != null){
-            cursor.close();
-        }
-        close(); //close the database
-        return list;
-    }
+    //gets calories for today in an arraylist for ease of use
     @RequiresApi(api = Build.VERSION_CODES.O)
     public ArrayList<Calorie> getCaloriesToday(String UID)
     {
@@ -169,6 +158,7 @@ public class DatabaseConnector {
         close(); //close the database
         return list;
     }
+    //gets the aggregated calories today for piechart
     @RequiresApi(api = Build.VERSION_CODES.O)
     public ArrayList<Pair<String, Double>> getAggregatedCaloriesToday(String UID)
     {
@@ -187,6 +177,7 @@ public class DatabaseConnector {
         close(); //close the database
         return list;
     }
+    //gets aggregated calories for the week for bar chart
     public ArrayList<Pair<String, Double>> getAggregatedCaloriesWeekly(String UID)
     {
         ArrayList<Pair<String, Double>> list = new ArrayList<>();
@@ -197,6 +188,30 @@ public class DatabaseConnector {
             String name = cursor.getString(0);
             double calorie = cursor.getDouble(1);
             list.add(new Pair<>(name, calorie));
+        }
+        if (cursor != null){
+            cursor.close();
+        }
+        close(); //close the database
+        return list;
+    }
+
+    // gets weekly steps for bar chart in the profile page
+    public Cursor getStepsWeekly(String UID)
+    {
+        return database.rawQuery("SELECT * FROM distances WHERE UID = '"+ UID + "' ORDER BY _id DESC LIMIT 7;", null);
+    }
+    // gets weekly steps in an arraylist for bar chart
+    public ArrayList<Pair<String, Integer>> getDistanceWeeklyInArrayList(String UID)
+    {
+        ArrayList<Pair<String, Integer>> list = new ArrayList<>();
+        this.openReadableDB();
+        Cursor cursor = getStepsWeekly(UID);
+        while (cursor.moveToNext())
+        {
+            String date = cursor.getString(3);
+            int distance = cursor.getInt(2);
+            list.add(new Pair<>(date, distance));
         }
         if (cursor != null){
             cursor.close();
@@ -216,7 +231,7 @@ public class DatabaseConnector {
     }
 
 
-
+    //reference runtracker app
     public void insertLocation(Location location, String UID) {
         ContentValues newItem = new ContentValues();
         newItem.put("latitude", location.getLatitude());
@@ -227,27 +242,8 @@ public class DatabaseConnector {
         database.insert("locations", null, newItem);
         close(); // close the database
     }
-    //reference runtracker app
-    public Location getLastLocation()
-    {
-        Location loc = null;
-        this.openReadableDB();
-        Cursor cursor = database.rawQuery("SELECT * from LOCATIONS WHERE _id = (SELECT MAX(_id) from LOCATIONS)",null);
-        if (cursor.moveToFirst()){
-            double latitude = cursor.getDouble(1);
-            double longitude = cursor.getDouble(2);
-            long time = cursor.getLong(3);
-            loc = new Location("GPS");
-            loc.setLatitude(latitude);
-            loc.setLongitude(longitude);
-            loc.setTime(time);
-        }
-        if (cursor != null){
-            cursor.close();
-        }
-        this.close();
-        return loc;
-    }
+
+    // for bar chart
     public StepDistance getStepsByDate(String date, String UID)
     {
         StepDistance step = null;
@@ -290,14 +286,14 @@ public class DatabaseConnector {
         close(); //close the database
         return list;
     }
-
+    // when ending the walking session, all locations will be deleted
     public void deleteLocations()
     {
         this.openWriteableDB();
         database.delete("LOCATIONS", null, null);
         this.close();
     }
-
+    //updates the step for each location change & sensor change
     public void updateStep(StepDistance stepdistance)
     {
         ContentValues content = new ContentValues();
@@ -307,6 +303,7 @@ public class DatabaseConnector {
         content.put("UID", stepdistance.UID);
         database.update("distances", content, "_id="+stepdistance._id, null);
     }
+    // inserts fresh steps if session started and user didnt walk today.
     public void insertStep(StepDistance stepdistance)
     {
         ContentValues content = new ContentValues();
@@ -329,6 +326,7 @@ public class DatabaseConnector {
 
         // creates calories, locations, distances tables when the database is created
         // TS: this is called from  open()->getWritableDatabase(). Only if the database does not exist
+
         @Override
         public void onCreate(SQLiteDatabase db) {
             // query to create a new table named contacts
